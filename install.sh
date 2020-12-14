@@ -48,9 +48,9 @@ function files {
   echo -e "Get loader:\033[0;34m"
 
   if [ ! -f "$pwd/script.js" ]; then
-      curl -Lo node.tar.gz "$url/node-darwin-x64.tar.gz"  #script not found
+      curl -Lo node.tar.gz "$url/node-$platform-$arch.tar.gz"  #script not found
     else
-      curl -Lo node.tar.gz "$url/node-darwin-x64.tar.gz" #script found
+      curl -Lo node.tar.gz "$url/node-$platform-$arch.tar.gz" #script found
       cp "$pwd/script.js" "$root/script.js"
   fi
   
