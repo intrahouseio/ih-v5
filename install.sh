@@ -49,6 +49,7 @@ function files {
 
   if [ ! -f "$pwd/script.js" ]; then
       curl -Lo node.tar.gz "$url/node-$platform-$arch.tar.gz"  #script not found
+      curl -Lo script.js "https://raw.githubusercontent.com/intrahouseio/ih-v5/main/script.js"
     else
       curl -Lo node.tar.gz "$url/node-$platform-$arch.tar.gz" #script found
       cp "$pwd/script.js" "$root/script.js"
