@@ -261,7 +261,7 @@ async function installCore() {
     project: 'testproject',
     name_service: 'intrahouse-d',
     lang: 'ru',
-    port: 3000,
+    port: 8088,
   }, 'utf8'));
   clearInterval(bar6);
   progress_bar('create config', '\x1b[32m' + 'ok')
