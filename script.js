@@ -78,6 +78,7 @@ function print_table(items) {
 function exec(text) {
   return new Promise((resolve, reject) => {
     child_process.exec(text, (error, stdout, stderr) => {
+      console.log(stdout, error)
       if (error) {
         resolve({ fail: error })
       }
