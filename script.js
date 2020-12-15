@@ -238,20 +238,20 @@ async function installCore() {
   console.log('\x1b[0m');
   console.log('\x1b[0m');
 
-  const bar4 = setInterval(() => progress_bar('downloading dependents', null), 125);
+  const bar4 = setInterval(() => progress_bar('downloading dependencies', null), 125);
   const buf2 = await file('https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0/node_modules.zip');
  
   fs.writeFileSync(`${store.paths.root}/node_modules.zip`, buf2);
 
   clearInterval(bar4);
-  progress_bar('downloading dependents', '\x1b[32m' + 'ok')
+  progress_bar('downloading dependencies', '\x1b[32m' + 'ok')
 
   console.log('')
 
-  const bar5 = setInterval(() => progress_bar('extract dependents', null), 125);
+  const bar5 = setInterval(() => progress_bar('extract dependencies', null), 125);
   const res2 = await exec(`unzip -o ${store.paths.root}/node_modules.zip -d ${store.paths.root}/backend`)
   clearInterval(bar5);
-  progress_bar('extract dependents', res2.fail ? '\x1b[31merror' : '\x1b[32mok')
+  progress_bar('extract dependencies', res2.fail ? '\x1b[31merror' : '\x1b[32mok')
 
   console.log('\x1b[0m');
   console.log('\x1b[0m');
