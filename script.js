@@ -173,8 +173,8 @@ async function detectInitSystem() {
     const initArray = Object.keys(hash_map);
     const pathArray = splitPath(process.env.PATH);
 
-    for (const p of pathArray) {
-      for (const init of initArray) {
+    for (const init of initArray) {
+      for (const p of pathArray) {
         const attempt = path.resolve(p, init);
         const check = checkPath(attempt);
    
