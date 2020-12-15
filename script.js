@@ -106,6 +106,7 @@ function installdep(item) {
     exec(item.install)
     .then(res => {
       clearInterval(bar);
+      console.log(res.fail)
       progress_bar(item.name, res.fail ? '\x1b[31m error' : '\x1b[32m ok')
       resolve();
     });
