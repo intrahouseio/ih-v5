@@ -78,7 +78,6 @@ function print_table(items) {
 function exec(text) {
   return new Promise((resolve, reject) => {
     child_process.exec(text, (error, stdout, stderr) => {
-      console.log(stdout, error)
       if (error) {
         resolve({ fail: error })
       }
@@ -291,11 +290,11 @@ async function registerServiceLinux() {
         console.log('\x1b[34m  ' + 'init config file'.padEnd(25, ' ') + '\x1b[32m ok')
       }
       if (initSystem === 'upstart') {
-        const destination = '/etc/init.d/intrahouse-d';
+        const destination = '/etc/init/intrahouse-d.conf';
         fs.writeFileSync(destination, template);
-        await exec(`chmod +x ${destination}`)
-        await exec('update-rc.d intrahouse-d defaults')
-        await exec('service intrahouse-d restart')
+        await exec('sudo initctl reload-configuration')
+        await exec('initctl stop intrahouse-d')
+        await exec('initctl start intrahouse-d')
         console.log('\x1b[34m  ' + 'init config file'.padEnd(25, ' ') + '\x1b[32m ok')
       }
       if (initSystem === 'launchd') {
