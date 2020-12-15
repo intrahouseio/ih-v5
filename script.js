@@ -106,7 +106,6 @@ function installdep(item) {
     exec(item.install)
     .then(res => {
       clearInterval(bar);
-      console.log(res.fail)
       progress_bar(item.name, res.fail ? '\x1b[31m error' : '\x1b[32m ok')
       resolve();
     });
@@ -287,6 +286,14 @@ async function registerServiceLinux() {
         const destination = '/etc/systemd/system/intrahouse-d.service';
         fs.writeFileSync(destination, template);
         await exec('systemctl enable intrahouse-d')
+        await exec('service intrahouse-d restart')
+        console.log('\x1b[34m  ' + 'init config file'.padEnd(25, ' ') + '\x1b[32m ok')
+      }
+      if (initSystem === 'upstart') {
+        const destination = '/etc/init.d/intrahouse-d';
+        fs.writeFileSync(destination, template);
+        await exec(`chmod +x ${destination}`)
+        await exec('update-rc.d intrahouse-d defaults')
         await exec('service intrahouse-d restart')
         console.log('\x1b[34m  ' + 'init config file'.padEnd(25, ' ') + '\x1b[32m ok')
       }
