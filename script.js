@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
 const https = require('https');
 const child_process = require('child_process');
@@ -17,6 +18,9 @@ const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
  
 
 const options = {
+  binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
+  asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
+  asset_name: 'ih-systems.zip',
   service_name: 'ih-v5',
   install_path: '/opt/ih-v5',
   install_deps: [
@@ -50,6 +54,163 @@ const options = {
   ]
 }
 
+function get_config() {
+  return JSON.stringify({
+    project: `project_${Date.now()}`,
+    name_service: 'intrahouse-d',
+    lang: 'ru',
+    port: 8088,
+  }, null, 2)
+}
+
+function get_template_service(type) {
+  if (type === 'systemd') {
+    return {
+      destination: `/etc/systemd/system/${options.service_name}.service`,
+      commands: [
+
+      ],
+      template: `
+      [Unit]
+      Description=${options.service_name}
+      After=network.target mysql.service
+  
+      [Service]
+      WorkingDirectory=${options.install_path}
+      Environment=PATH=${options.install_path}/node/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+      Restart=always
+  
+      ExecStart=${options.install_path}/node/bin/node ${options.install_path}/backend/app.js prod
+  
+      StandardOutput=syslog
+      StandardError=syslog
+      SyslogIdentifier=${options.service_name}
+  
+      [Install]
+      WantedBy=multi-user.target
+      `
+    };
+  }
+
+  if (type === 'upstart') {
+    return {
+      destination: `/etc/init/${options.service_name}.conf`,
+      commands: [
+
+      ],
+      template: `
+      description "${options.service_name}"
+  
+      start on (filesystem and net-device-up IFACE!=lo)
+      stop on runlevel [!2345]
+  
+      chdir ${options.install_path}
+  
+      env DAEMON="${options.install_path}/node/bin/node ${options.install_path}/backend/app.js prod"
+      env PATH=${options.install_path}/node/bin:$PATH
+  
+      respawn
+      respawn limit unlimited
+  
+      exec $DAEMON
+      `
+    };
+  }
+
+  if (type === 'launchd') {
+    return {
+      destination: path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`),
+      commands: [
+
+      ],
+      template: `
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+        <dict>
+          <key>Label</key>
+            <string>${options.service_name}</string>
+          <key>KeepAlive</key>
+            <true/>
+          <key>ProgramArguments</key>
+            <array>
+              <string>${options.install_path}/node/bin/node</string>
+              <string>${options.install_path}/backend/app.js</string>
+              <string>prod</string>
+            </array>
+          <key>RunAtLoad</key>
+            <true/>
+          <key>OnDemand</key>
+            <false/>
+          <key>WorkingDirectory</key>
+            <string>${options.install_path}</string>
+          <key>EnvironmentVariables</key>
+          <dict>
+            <key>PATH</key>
+              <string>${options.install_path}/node/bin</string>
+          </dict>
+          <key>StandardOutPath</key>
+            <string>${options.install_path}/launchdOutput.log</string>
+          <key>StandardErrorPath</key>
+            <string>${options.install_path}/launchdErrors.log</string>
+        </dict>
+      </plist>
+      `
+    };
+  }
+
+  return null;
+}
+
+//-------------------------------------------------------
+
+function abort(msg) {
+  console.log(COLOR_ERROR)
+  console.log('-----------------Installation Aborted-----------------')
+  console.log('');
+  console.log(msg)
+  console.log('------------------------------------------------------')
+  console.log(COLOR_CLEAR)
+  console.log(COLOR_INFO + 'Please visit https://github.com/intrahouseio/ih-v5/issues\nto approve this error or send to email support@ih-systems.com')
+  console.log(COLOR_CLEAR)
+  console.log(COLOR_CLEAR)
+  process.exit(1);
+}
+
+function json(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+      let rawData = '';
+      res.on('data', chunk => rawData += chunk.toString());
+      res.on('end', () => resolve(JSON.parse(rawData)));
+    }).on('error', reject);
+  });
+}
+
+function file(url, _path) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+      let rawData = [];
+      res.on('data', chunk => rawData.push(chunk));
+      res.on('end', () => {
+        if (res.headers.location) {
+          file(res.headers.location, _path)
+            .then(resolve)
+            .catch(reject)
+        } else {
+          if (_path) {
+            fsp.writeFile(_path, Buffer.concat(rawData))
+            .then(resolve)
+            .catch(reject)
+          } else {
+            resolve(Buffer.concat(rawData));
+          }
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
 function exec(cmd) {
   return new Promise((resolve, reject) => {
     child_process.exec(cmd, (error, stdout, stderr) => {
@@ -60,6 +221,55 @@ function exec(cmd) {
       }
     });
   });
+}
+
+function splitPath(p) {
+  return p ? p.split(path.delimiter) : [];
+}
+
+function statFollowLinks() {
+  return fs.statSync.apply(fs, arguments);
+}
+
+function checkPath(pathName) {
+  return fs.existsSync(pathName) && !statFollowLinks(pathName).isDirectory();
+}
+
+async function detect_init_system() {
+    let system = null;
+
+    const hash_map = {
+      'systemctl'  : 'systemd',
+      'update-rc.d': 'upstart',
+      'chkconfig'  : 'systemv',
+      'rc-update'  : 'openrc',
+      'launchctl'  : 'launchd',
+      'sysrc'      : 'rcd',
+      'rcctl'      : 'rcd-openbsd',
+      'svcadm'     : 'smf'
+    };
+    
+    const initArray = Object.keys(hash_map);
+    const pathArray = splitPath(process.env.PATH);
+
+    for (const init of initArray) {
+      for (const p of pathArray) {
+        const attempt = path.resolve(p, init);
+        const check = checkPath(attempt);
+   
+        if (system === null && check) {
+          system = hash_map[init]
+        }
+      }
+    }
+    return system;
+}
+
+function getAssetByName(release, name) {
+  if (release.assets !== undefined) {
+    return release.assets.find(i => i.name === name) || null;
+  }
+  return null;
 }
 
 function progress_bar_start(title) {
@@ -129,27 +339,20 @@ function check_dep(item) {
   });
 }
 
-function cmd(name, promise) {
+function cmd(name, promise, auto = true) {
   return new Promise((resolve, reject) => {
     progress_bar_start(name)
 
     promise
       .then(res => {
-        progress_bar_stop('ok', COLOR_OK);
+        if (auto) {
+          progress_bar_stop('ok', COLOR_OK);
+        }
         resolve(res);
       })
       .catch(e => {
         progress_bar_stop('error', COLOR_ERROR);
-        console.log(COLOR_ERROR)
-        console.log('-----------------Installation Aborted-----------------')
-        console.log('');
-        console.log(e)
-        console.log('------------------------------------------------------')
-        console.log(COLOR_CLEAR)
-        console.log(COLOR_INFO + 'Please visit https://github.com/intrahouseio/ih-v5/issues\nto approve this error or send to email support@ih-systems.com')
-        console.log(COLOR_CLEAR)
-        console.log(COLOR_CLEAR)
-        process.exit(1);
+        abort(e.message ? e.message : e);
       })
   });
 }
@@ -191,6 +394,37 @@ async function install_dependencies() {
 async function install_core() {
   print_title('Install core');
 
+  const res = await cmd('found version', json(options.asset_url), false);
+  const asset = getAssetByName(res, options.asset_name);
+  
+  if (!(asset && asset.browser_download_url)) {
+    abort('Version not found: ' + options.asset_url + ' | ' + options.asset_name); 
+  }
+  progress_bar_stop(res.tag_name, COLOR_INFO);
+
+  console.log('');
+
+  await cmd('downloading core', file(asset.browser_download_url, `${options.install_path}/core.zip`));
+  await cmd('extract core', exec(`unzip -o ${options.install_path}/core.zip -d ${options.install_path}`));
+
+  console.log('');
+
+  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/deps.zip`));
+  await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/deps.zip -d ${options.install_path}/backend`));
+
+  console.log('');
+
+  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(),'utf8'));
+}
+
+async function register_service() {
+  print_title('Register service');
+
+  const init_system = await detect_init_system();
+  const template_service = get_template_service(init_system);
+
+  print_row('init system detected', template_service, init_system, '[not supported]', COLOR_INFO, COLOR_ERROR)
+
 }
 
 
@@ -198,8 +432,9 @@ async function main() {
   await check_dependencies();
   await install_dependencies();
   await install_core();
+  await register_service();
 
-  console.log('\n main');
+  // console.log('\n main');
 }
 
 main()
