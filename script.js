@@ -68,7 +68,8 @@ function get_template_service(type) {
     return {
       destination: `/etc/systemd/system/${options.service_name}.service`,
       commands: [
-
+        `systemctl enable ${options.service_name}`,
+        `service ${options.service_name} restart`,
       ],
       template: `
       [Unit]
@@ -96,7 +97,9 @@ function get_template_service(type) {
     return {
       destination: `/etc/init/${options.service_name}.conf`,
       commands: [
-
+        'initctl reload-configuration',
+        `initctl stop ${options.service_name}`,
+        `initctl start ${options.service_name}`,
       ],
       template: `
       description "${options.service_name}"
@@ -121,7 +124,8 @@ function get_template_service(type) {
     return {
       destination: path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`),
       commands: [
-
+        `launchctl load -w ${path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`)}`,
+        `launchctl start ${options.service_name}`,
       ],
       template: `
       <?xml version="1.0" encoding="UTF-8"?>
@@ -421,9 +425,13 @@ async function register_service() {
   print_title('Register service');
 
   const init_system = await detect_init_system();
-  const template_service = get_template_service(init_system);
+  const service = get_template_service(init_system);
 
-  print_row('init system detected', template_service, init_system, '[not supported]', COLOR_INFO, COLOR_ERROR)
+  print_row('init system detected', service, init_system, '[not supported]', COLOR_INFO, COLOR_ERROR)
+
+  if (service) {
+    await cmd('init config file', fsp.writeFile(service.destination, service.template,'utf8'));
+  }
 
 }
 
