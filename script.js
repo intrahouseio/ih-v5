@@ -432,7 +432,6 @@ async function register_service() {
   if (service) {
     await cmd('init config file', fsp.writeFile(service.destination, service.template,'utf8'));
   }
-
 }
 
 
