@@ -226,6 +226,7 @@ function exec(cmd) {
           abort(e);
         }
       }
+      resolve(true);
     } else {
       child_process.exec(cmd, (error, stdout, stderr) => {
         if (error) {
