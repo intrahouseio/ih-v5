@@ -229,7 +229,6 @@ function exec(cmd) {
     } else {
       child_process.exec(cmd, (error, stdout, stderr) => {
         if (error) {
-          console.log(error)
           reject(error.message)
         } else {
           resolve(stdout)
