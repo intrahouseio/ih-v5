@@ -7,7 +7,7 @@ echo -e "\033[0;31m"
 #-------------- functions
 function config {
    pwd=$(pwd)
-   name_service="intrahouse-d"
+   name_service="ih-v5"
    root="/opt/$name_service"
    url="https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0"
 }
