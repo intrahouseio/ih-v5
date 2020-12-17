@@ -125,6 +125,7 @@ function get_template_service(type) {
       destination: path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`),
       commands: [
         `launchctl load -w ${path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`)}`,
+        `launchctl stop ${options.service_name}`,
         `launchctl start ${options.service_name}`,
       ],
       template: `
@@ -216,14 +217,25 @@ function file(url, _path) {
 }
 
 function exec(cmd) {
-  return new Promise((resolve, reject) => {
-    child_process.exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        reject(error.message)
-      } else {
-        resolve(stdout)
+  return new Promise(async (resolve, reject) => {
+    if (Array.isArray(cmd)) {
+      for (const i of cmd) {
+        try {
+          await exec(i);
+        } catch (e) {
+          abort(e);
+        }
       }
-    });
+    } else {
+      child_process.exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+          console.log(error)
+          reject(error.message)
+        } else {
+          resolve(stdout)
+        }
+      });
+    }
   });
 }
 
@@ -430,7 +442,12 @@ async function register_service() {
   print_row('init system detected', service, init_system, '[not supported]', COLOR_INFO, COLOR_ERROR)
 
   if (service) {
-    await cmd('init config file', fsp.writeFile(service.destination, service.template,'utf8'));
+    console.log('');
+
+    await cmd('service config file', fsp.writeFile(service.destination, service.template, 'utf8'));
+    await cmd('service activation', exec(service.commands));
+  } else {
+    abort(`This platform does not support init systems ${process.platform}/${process.arch}`)
   }
 }
 
