@@ -1,6 +1,7 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
+const http = require('http');
 const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
@@ -355,7 +356,7 @@ function check_dep(item) {
   });
 }
 
-function cmd(name, promise, auto = true) {
+function cmd(name, promise, auto = true, isAbort = true) {
   return new Promise((resolve, reject) => {
     progress_bar_start(name)
 
@@ -368,9 +369,41 @@ function cmd(name, promise, auto = true) {
       })
       .catch(e => {
         progress_bar_stop('error', COLOR_ERROR);
-        abort(e.message ? e.message : e);
+        if (isAbort) {
+          abort(e.message ? e.message : e);
+        } else {
+          resolve(e.message ? e.message : e);
+        }
       })
   });
+}
+
+
+function check_service() {
+  return new Promise((resolve, reject) => {
+    exec('ps aux')
+    .then(res => {
+      if (res.indexOf(options.service_name) === -1) {
+        reject('service process not found!')
+      } else {
+        resolve(true)
+      }
+    })
+    .catch(() => reject('service not found!'))
+  });
+}
+
+function check_port() {
+  return new Promise((resolve, reject) => {
+    http.get(`http://127.0.0.1:8088/admin`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+      if (res.statusCode === 200) {
+        resolve(true)
+      } else {
+        reject('service port not found!')
+      }
+    }).on('error', reject);
+  })
+
 }
 
 
@@ -446,9 +479,42 @@ async function register_service() {
 
     await cmd('service config file', fsp.writeFile(service.destination, service.template, 'utf8'));
     await cmd('service activation', exec(service.commands));
+
+    console.log('');
+
+    await cmd('cehck service', check_service(), true, false);
+    await cmd('cehck port', check_port(), true, false);
+
   } else {
     abort(`This platform does not support init systems ${process.platform}/${process.arch}`)
   }
+}
+
+function info() {
+  console.log('\x1b[0m');
+  console.log('\x1b[0m');
+  console.log('\x1b[0m');
+  console.log('\x1b[34m-----------------------------------------------------------------------------------')
+  
+
+  const nets = networkInterfaces();
+
+  const ips = Object
+    .keys(nets)
+    .reduce((p, c) => p.concat(nets[c]), [])
+    .filter(i => i.internal === false && i.family === 'IPv4')
+    .map(i => `http://${i.address}:8088/admin`)
+    .join(', ');
+
+  console.log('\x1b[0m');
+  console.log(`\x1b[34m Login:\x1b[35m admin`);
+  console.log(`\x1b[34m Password:\x1b[35m 202020`);
+  console.log(`\x1b[34m Web interface:\x1b[35m ${ips}`);
+  console.log('\x1b[0m');
+  console.log('\x1b[34m Complete! Thank you.');
+  console.log('\x1b[0m');
+
+  return Promise.resolve();
 }
 
 
@@ -457,6 +523,7 @@ async function main() {
   await install_dependencies();
   await install_core();
   await register_service();
+  await info();
 
   // console.log('\n main');
 }
