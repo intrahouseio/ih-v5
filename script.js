@@ -223,7 +223,7 @@ function exec(cmd) {
         try {
           await exec(i);
         } catch (e) {
-          abort(e);
+          // abort(e);
         }
       }
       resolve(true);
