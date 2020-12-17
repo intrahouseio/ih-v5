@@ -420,7 +420,7 @@ function check_port() {
 
     function req() {
       http
-      .get(`http://127.0.0.1:8088/admin`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, callback)
+      .get(`http://127.0.0.1:8088/admin/`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, callback)
       .on('error', error);
     }
 
