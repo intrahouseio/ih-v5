@@ -395,13 +395,36 @@ function check_service() {
 
 function check_port() {
   return new Promise((resolve, reject) => {
-    http.get(`http://127.0.0.1:8088/admin`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+    let i = 0
+
+    function check() {
+      i++;
+      if (i > 5) {
+        reject('service port not found!')
+      } else {
+        setTimeout(() => req(), 1700)
+      }
+    }
+
+    function callback(res) {
       if (res.statusCode === 200) {
         resolve(true)
       } else {
-        reject('service port not found!')
+        check();
       }
-    }).on('error', reject);
+    }
+
+    function error() {
+      check();
+    }
+
+    function req() {
+      http
+      .get(`http://127.0.0.1:8088/admin`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, callback)
+      .on('error', error);
+    }
+
+    req();
   })
 
 }
