@@ -63,13 +63,20 @@ const options = {
       id: 'emuls',
       destination: 'intraHouse.plugin-Sensors-Emulator',
     }
+  ],
+  install_agents: [
+    {
+      name: 'influxDB',
+      id: 'influx',
+      destination: 'ih-dbagent-influx',
+    }
   ]
 }
 
 function get_config(name) {
   return JSON.stringify({
     project: name,
-    name_service: 'intrahouse-d',
+    name_service: options.service_name,
     lang: 'ru',
     port: options.port,
   }, null, 2)
@@ -579,6 +586,21 @@ async function install_plugins () {
   }
 }
 
+async function install_agents () {
+  print_title('Install agents');
+  fs.mkdirSync(`${options.data_path}/agents`, { recursive: true });
+
+  let q = 0;
+  
+  for (const i of options.install_agents) {
+    if (q !== 0) {
+      console.log('');
+    }
+    await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/agents`), true, false);
+    q++
+  }
+}
+
 async function register_service() {
   print_title('Register service');
 
@@ -636,6 +658,7 @@ async function main() {
   await install_dependencies();
   await install_core();
   await install_plugins();
+  await install_agents();
   await register_service();
   await info();
 
