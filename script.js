@@ -574,7 +574,7 @@ async function install_plugins () {
     if (q !== 0) {
       console.log('');
     }
-    await cmd(`install ${i.name}`, git(i.id, i.destination, `${options.data_path}/plugins`), true, false);
+    await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/plugins`), true, false);
     q++
   }
 }
