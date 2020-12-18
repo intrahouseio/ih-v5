@@ -21,9 +21,11 @@ const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
 const options = {
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
+  files_url: 'https://github.com/intrahouseio/ih-v5-files/raw/main',
   asset_name: 'ih-systems.zip',
   service_name: 'ih-v5',
   install_path: '/opt/ih-v5',
+  data_path: '/var/lib/ih-v5', 
   install_deps: [
     { 
       name: 'zip', 
@@ -55,9 +57,9 @@ const options = {
   ]
 }
 
-function get_config() {
+function get_config(name) {
   return JSON.stringify({
-    project: `project_${Date.now()}`,
+    project: name,
     name_service: 'intrahouse-d',
     lang: 'ru',
     port: 8088,
@@ -181,6 +183,27 @@ function abort(msg) {
   console.log(COLOR_CLEAR)
   console.log(COLOR_CLEAR)
   process.exit(1);
+}
+
+function dir(src, dest) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (fs.existsSync(src)) {
+        const stats = fs.statSync(src);
+        if (stats.isDirectory()) {
+          fs.mkdirSync(dest, { recursive: true });
+          fs.readdirSync(src).forEach(childItemName => {
+            dir(path.join(src, childItemName), path.join(dest, childItemName));
+          });
+        } else {
+          fs.copyFileSync(src, dest);
+        }
+      }
+      resolve();
+    } catch(e) {
+      reject(e)
+    }
+  })
 }
 
 function json(url) {
@@ -485,8 +508,15 @@ async function install_core() {
   await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/deps.zip -d ${options.install_path}/backend`));
 
   console.log('');
+  const project_name = `demo_${Date.now()}`;
 
-  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(),'utf8'));
+  await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/project.zip`));
+  await cmd('extract project', exec(`unzip -o ${options.install_path}/project.zip -d ${options.install_path}/project`));
+  await cmd('copy project', dir(`${options.install_path}/project`, `${options.data_path}/projects/${project_name}`));
+
+  console.log('');
+
+  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(project_name),'utf8'));
 }
 
 async function register_service() {
