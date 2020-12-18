@@ -661,8 +661,6 @@ async function main() {
   await install_agents();
   await register_service();
   await info();
-
-  // console.log('\n main');
 }
 
 main()
