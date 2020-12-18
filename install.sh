@@ -9,14 +9,18 @@ function config {
    pwd=$(pwd)
    name_service="ih-v5"
    root="/opt/$name_service"
+   temp="$root/temp"
+   node="$root/node"
    url="https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0"
 }
 
 function clear {
   rm -fr $root
   mkdir -p $root
+  mkdir -p $temp
+  mkdir -p $node
   cd $root
-  mkdir -p node
+  
 }
 
 function logo {

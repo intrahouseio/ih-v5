@@ -19,9 +19,11 @@ const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
  
 
 const options = {
+  port: 8088,
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
   files_url: 'https://github.com/intrahouseio/ih-v5-files/raw/main',
+  plugins_url: 'https://github.com/intrahouseio',
   asset_name: 'ih-systems.zip',
   service_name: 'ih-v5',
   install_path: '/opt/ih-v5',
@@ -54,6 +56,13 @@ const options = {
         linux: 'sudo apt-get install -y rsync',
       },
     },
+  ],
+  install_plugins: [
+    { 
+      name: 'emulator',
+      id: 'emuls',
+      destination: 'intraHouse.plugin-Sensors-Emulator',
+    }
   ]
 }
 
@@ -62,7 +71,7 @@ function get_config(name) {
     project: name,
     name_service: 'intrahouse-d',
     lang: 'ru',
-    port: 8088,
+    port: options.port,
   }, null, 2)
 }
 
@@ -213,6 +222,22 @@ function json(url) {
       res.on('data', chunk => rawData += chunk.toString());
       res.on('end', () => resolve(JSON.parse(rawData)));
     }).on('error', reject);
+  });
+}
+
+function git(name, _path) {
+  return new Promise((resolve, reject) => {
+    json(`https://api.github.com/repos/intrahouseio/${name}/releases/latest`)
+      .then(res => {
+        if (res.zipball_url) {
+          file(res.zipball_url, _path)
+            .then(resolve)
+            .catch(reject)
+        } else {
+          reject('latest release not found!')
+        }
+      })
+      .catch(reject)
   });
 }
 
@@ -443,7 +468,7 @@ function check_port() {
 
     function req() {
       http
-      .get(`http://127.0.0.1:8088/admin/`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, callback)
+      .get(`http://127.0.0.1:${options.port}/admin/`, { headers: { 'User-Agent': 'Mozilla/5.0' }}, callback)
       .on('error', error);
     }
 
@@ -499,24 +524,41 @@ async function install_core() {
 
   console.log('');
 
-  await cmd('downloading core', file(asset.browser_download_url, `${options.install_path}/core.zip`));
-  await cmd('extract core', exec(`unzip -o ${options.install_path}/core.zip -d ${options.install_path}`));
+  await cmd('downloading core', file(asset.browser_download_url, `${options.install_path}/temp/core.zip`));
+  await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
 
   console.log('');
 
-  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/deps.zip`));
-  await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/deps.zip -d ${options.install_path}/backend`));
+  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/temp/deps.zip`));
+  await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
 
   console.log('');
   const project_name = `demo_${Date.now()}`;
 
-  await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/project.zip`));
-  await cmd('extract project', exec(`unzip -o ${options.install_path}/project.zip -d ${options.install_path}/project`));
-  await cmd('copy project', dir(`${options.install_path}/project`, `${options.data_path}/projects/${project_name}`));
+  await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
+  await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`));
+  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${project_name}`));
 
   console.log('');
 
   await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(project_name),'utf8'));
+}
+
+async function install_plugins () {
+  print_title('Install plugins');
+  
+  fs.mkdirSync(`${options.data_path}/plugins`, { recursive: true });
+
+  let q = 0;
+  
+  for (const i of options.install_plugins) {
+    if (q !== 0) {
+      console.log('');
+    }
+    await cmd(`downloading ${i.name}`, git(i.destination, `${options.install_path}/temp/${i.id}.zip`), true, false);
+    await cmd(`extract ${i.name}`, exec(`unzip -o ${options.install_path}/temp/${i.id}.zip -d ${options.data_path}/plugins/${i.id}`), true, true);
+    q++
+  }
 }
 
 async function register_service() {
@@ -556,7 +598,7 @@ function info() {
     .keys(nets)
     .reduce((p, c) => p.concat(nets[c]), [])
     .filter(i => i.internal === false && i.family === 'IPv4')
-    .map(i => `http://${i.address}:8088/admin`)
+    .map(i => `http://${i.address}:${options.port}/admin`)
     .join(', ');
 
   console.log('\x1b[0m');
@@ -575,6 +617,7 @@ async function main() {
   await check_dependencies();
   await install_dependencies();
   await install_core();
+  await install_plugins();
   await register_service();
   await info();
 
