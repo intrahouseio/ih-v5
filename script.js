@@ -225,13 +225,32 @@ function json(url) {
   });
 }
 
-function git(name, _path) {
+function git(id, name, _path) {
   return new Promise((resolve, reject) => {
+    const _pathz = `${options.install_path}/temp/${id}.zip`;
     json(`https://api.github.com/repos/intrahouseio/${name}/releases/latest`)
       .then(res => {
         if (res.zipball_url) {
-          file(res.zipball_url, _path)
-            .then(resolve)
+          file(res.zipball_url, _pathz)
+            .then(() => {
+              exec(`unzip -o ${_pathz} -d ${options.install_path}/temp/${id}`)
+                .then(() => {
+                  fs.readdir(`${options.install_path}/temp/${id}`, (err, files) => {
+                    if (err) {
+                      reject(err)
+                    } else {
+                      if (files.length === 1) {
+                        dir(`${options.install_path}/temp/${id}/${files[0]}`, `${_path}/${id}`)
+                          .then(resolve)
+                          .catch(reject);
+                      } else {
+                        reject('unzip folder empty or many files!')
+                      }
+                    }
+                  });
+                })
+                .catch(reject);
+            })
             .catch(reject)
         } else {
           reject('latest release not found!')
@@ -555,8 +574,7 @@ async function install_plugins () {
     if (q !== 0) {
       console.log('');
     }
-    await cmd(`downloading ${i.name}`, git(i.destination, `${options.install_path}/temp/${i.id}.zip`), true, false);
-    await cmd(`extract ${i.name}`, exec(`unzip -o ${options.install_path}/temp/${i.id}.zip -d ${options.data_path}/plugins/${i.id}`), true, true);
+    await cmd(`install ${i.name}`, git(i.id, i.destination, `${options.data_path}/plugins`), true, false);
     q++
   }
 }
