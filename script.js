@@ -617,8 +617,8 @@ async function register_service() {
 
     console.log('');
 
-    await cmd('cehck service', check_service(), true, false);
-    await cmd('cehck port', check_port(), true, false);
+    await cmd('check service', check_service(), true, false);
+    await cmd('check port', check_port(), true, false);
 
   } else {
     abort(`This platform does not support init systems ${process.platform}/${process.arch}`)
