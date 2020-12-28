@@ -5,12 +5,6 @@ const http = require('http');
 const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
-const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
 
 const COLOR_CLEAR = '\x1b[0m';
 const COLOR_TITLE = '\x1b[33m';
@@ -79,9 +73,9 @@ const options = {
   ]
 }
 
-function get_config(name) {
+function get_config() {
   return JSON.stringify({
-    project: name,
+    project: options.project_name,
     name_service: options.service_name,
     lang: 'ru',
     port: options.port,
@@ -458,41 +452,6 @@ function cmd(name, promise, auto = true, isAbort = true) {
   });
 }
 
-function question() {
-  return new Promise((resolve, reject) => {
-
-    function check(port) {
-      options.port = port;
-      cmd(`check port: ${options.port}`, check_port(true), true, false)
-      .then((res) => {
-        if (res === true) {
-          resolve();
-        } else {
-          console.log('');
-          console.log(`${COLOR_ERROR}  port is already in use ${options.port}!\n${COLOR_CLEAR}`)
-          ask();
-        }
-      })
-    }
-    function ask() {
-      rl.question(`${COLOR_ROW}  enter server port [${options.port}]: ${COLOR_INFO}`, res => {
-        if (res === '') {
-          check(options.port)
-        } else {
-          const port = Number(res);
-          if (isNaN(port)) {
-            console.log('');
-            console.log(`${COLOR_ERROR}  invalid port number: ${res}!\n${COLOR_CLEAR}`)
-            ask();
-          } else {
-            check(port)
-          }
-        }
-      });
-    }
-    ask();
-  })
-}
 
 function check_service() {
   return new Promise((resolve, reject) => {
@@ -550,6 +509,20 @@ function check_port(isExist = false) {
     req();
   })
 
+}
+
+function get_port() {
+  return new Promise((resolve, reject) => {
+    function check() {
+      check_port(true)
+      .then(resolve)
+      .catch(() => {
+        options.port = options.port + 1;
+        check();
+      })
+    }
+    check();
+  });
 }
 
 
@@ -612,6 +585,11 @@ async function install_core() {
   await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
   await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`));
   await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`));
+
+  console.log('');
+
+  await get_port();
+  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(),'utf8'));
 }
 
 async function install_plugins () {
@@ -643,17 +621,6 @@ async function install_agents () {
     await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/agents`), true, false);
     q++
   }
-}
-
-async function set_settings() {
-  print_title('Settings');
-
-
-  await question();
-
-  console.log('');
-
-  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(options.project_name),'utf8'));
 }
 
 async function register_service() {
@@ -714,7 +681,6 @@ async function main() {
   await install_core();
   await install_plugins();
   await install_agents();
-  await set_settings();
   await register_service();
   await info();
 }
