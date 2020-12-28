@@ -709,13 +709,13 @@ function info() {
 
 
 async function main() {
-  await check_dependencies();
-  await install_dependencies();
-  await install_core();
-  await install_plugins();
-  await install_agents();
+  // await check_dependencies();
+  // await install_dependencies();
+  // await install_core();
+  // await install_plugins();
+  // await install_agents();
   await set_settings();
-  await register_service();
+  // await register_service();
   await info();
 }
 
