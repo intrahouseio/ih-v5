@@ -5,6 +5,11 @@ const http = require('http');
 const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 
 const COLOR_CLEAR = '\x1b[0m';
@@ -19,6 +24,7 @@ const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
  
 
 const options = {
+  project_name: `demo_${Date.now()}`,
   port: 8088,
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
@@ -452,6 +458,41 @@ function cmd(name, promise, auto = true, isAbort = true) {
   });
 }
 
+function question() {
+  return new Promise((resolve, reject) => {
+
+    function check(port) {
+      options.port = port;
+      cmd(`check port: ${options.port}`, check_port(true), true, false)
+      .then((res) => {
+        if (res === true) {
+          resolve();
+        } else {
+          console.log('');
+          console.log(`${COLOR_ERROR}  port is already in use ${options.port}!\n${COLOR_CLEAR}`)
+          ask();
+        }
+      })
+    }
+    function ask() {
+      rl.question(`${COLOR_ROW}  enter server port [${options.port}]: ${COLOR_INFO}`, res => {
+        if (res === '') {
+          check(options.port)
+        } else {
+          const port = Number(res);
+          if (isNaN(port)) {
+            console.log('');
+            console.log(`${COLOR_ERROR}  invalid port number: ${res}!\n${COLOR_CLEAR}`)
+            ask();
+          } else {
+            check(port)
+          }
+        }
+      });
+    }
+    ask();
+  })
+}
 
 function check_service() {
   return new Promise((resolve, reject) => {
@@ -467,7 +508,7 @@ function check_service() {
   });
 }
 
-function check_port() {
+function check_port(isExist = false) {
   return new Promise((resolve, reject) => {
     let i = 0
 
@@ -481,15 +522,23 @@ function check_port() {
     }
 
     function callback(res) {
-      if (res.statusCode === 200) {
-        resolve(true)
+      if (isExist) {
+        reject('port busy!');
       } else {
-        check();
+        if (res.statusCode === 200) {
+          resolve(true)
+        } else {
+          check();
+        }
       }
     }
 
     function error() {
-      check();
+      if (isExist) {
+        resolve(true)
+      } else {
+        check();
+      }
     }
 
     function req() {
@@ -559,15 +608,10 @@ async function install_core() {
   await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
 
   console.log('');
-  const project_name = `demo_${Date.now()}`;
 
   await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
   await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`));
-  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${project_name}`));
-
-  console.log('');
-
-  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(project_name),'utf8'));
+  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`));
 }
 
 async function install_plugins () {
@@ -599,6 +643,17 @@ async function install_agents () {
     await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/agents`), true, false);
     q++
   }
+}
+
+async function set_settings() {
+  print_title('Settings');
+
+
+  await question();
+
+  console.log('');
+
+  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(options.project_name),'utf8'));
 }
 
 async function register_service() {
@@ -659,6 +714,7 @@ async function main() {
   await install_core();
   await install_plugins();
   await install_agents();
+  await set_settings();
   await register_service();
   await info();
 }
