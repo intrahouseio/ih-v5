@@ -22,7 +22,7 @@ const options = {
   port: 8088,
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
-  files_url: 'https://github.com/intrahouseio/ih-v5-files/raw/main',
+  files_url: 'https://github.com/intrahouseio/ih-v5/raw/main',
   plugins_url: 'https://github.com/intrahouseio',
   asset_name: 'ih-systems.zip',
   service_name: 'ih-v5',
@@ -581,8 +581,8 @@ async function install_core() {
   await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
 
   console.log('');
-
-  await cmd('downloading project', file(`${options.files_url}/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
+ 
+  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
   await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`));
   await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`));
 
