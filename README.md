@@ -1,3 +1,4 @@
 ##### ih-v5
 
-`curl -sL https://git.io/JLIuM | sudo -E bash `
+`sudo su`
+`bash <(curl -sL https://git.io/JLIuM)`
