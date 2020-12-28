@@ -593,9 +593,9 @@ async function install_core() {
 
   console.log('');
  
-  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`));
-  await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`));
-  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`));
+  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`), true, false);
+  await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
+  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`), true, false);
 
   console.log('');
 
