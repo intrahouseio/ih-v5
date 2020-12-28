@@ -528,6 +528,17 @@ function get_port() {
 
 //-------------------------------------------------------
 
+async function cleanup() {
+  exec(`service ${options.service_name} stop`)
+    .then(() => {})
+    .catch(() => {});
+  exec(`initctl stop ${options.service_name}`)
+    .then(() => {})
+    .catch(() => {});
+  exec(`launchctl stop ${options.service_name}`)
+    .then(() => {})
+    .catch(() => {});
+}
 
 async function check_dependencies() {
   print_title('Check dependencies');
@@ -676,6 +687,7 @@ function info() {
 
 
 async function main() {
+  await cleanup();
   await check_dependencies();
   await install_dependencies();
   await install_core();
