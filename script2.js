@@ -269,6 +269,7 @@ function git(id, name, _path) {
 
 function file(url, _path) {
   return new Promise((resolve, reject) => {
+    console.log(url);
     https.get(url, { family: 4, headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
       let rawData = [];
       res.on('data', chunk => rawData.push(chunk));
