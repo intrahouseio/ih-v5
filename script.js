@@ -269,7 +269,19 @@ function git(id, name, _path) {
 
 function file(url, _path) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+    function lookup(hostname, options, callback) {
+      let i = 1;
+      function handleLookup(err, address, family) {
+        if (err && i < 6) {
+          i++;
+          setTimeout(() => dns.lookup(hostname, options, handleLookup), 1500 * i);
+        } else {
+          callback(err, address, family);
+        }
+      }
+      dns.lookup(hostname, options, handleLookup);
+    }
+    https.get(url, { family: 4, lookup, headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
       let rawData = [];
       res.on('data', chunk => rawData.push(chunk));
       res.on('end', () => {
