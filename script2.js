@@ -271,13 +271,13 @@ function git(id, name, _path) {
 function file(url, _path) {
   return new Promise((resolve, reject) => {
     function lookup(hostname, options, callback) {
-      let i = 0;
+      let i = 1;
       function handleLookup(err, address, family) {
-        if (err && i < 5) {
+        if (err && i < 6) {
           console.log('-----------ERROR DNS -----------')
           console.log(err)
           i++;
-          dns.lookup(hostname, options, handleLookup);
+          setTimeout(() => dns.lookup(hostname, options, handleLookup), 1500 * i);
         } else {
           callback(err, address, family);
         }
