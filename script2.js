@@ -271,10 +271,18 @@ function git(id, name, _path) {
 function file(url, _path) {
   return new Promise((resolve, reject) => {
     function lookup(hostname, options, callback) {
-      dns.lookup(hostname, options, (err, address, family) => {
-        console.log(err, hostname, options, address, family);
-        callback(err, address, family);
-      })
+      let i = 0;
+      function handleLookup(err, address, family) {
+        if (err && i < 5) {
+          console.log('-----------ERROR DNS -----------')
+          console.log(err)
+          i++;
+          dns.lookup(hostname, options, handleLookup);
+        } else {
+          callback(err, address, family);
+        }
+      }
+      dns.lookup(hostname, options, handleLookup);
     }
     console.log(url);
     https.get(url, { family: 4, lookup, headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
