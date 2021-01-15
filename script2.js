@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
+const dns = require('dns');
 
 const COLOR_CLEAR = '\x1b[0m';
 const COLOR_TITLE = '\x1b[33m';
@@ -269,8 +270,14 @@ function git(id, name, _path) {
 
 function file(url, _path) {
   return new Promise((resolve, reject) => {
+    function lookup(hostname, options, callback) {
+      dns.lookup(hostname, options, (err, address, family) => {
+        console.log(err, hostname, options, address, family);
+        callback(err, address, family);
+      })
+    }
     console.log(url);
-    https.get(url, { family: 4, headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
+    https.get(url, { family: 4, lookup, headers: { 'User-Agent': 'Mozilla/5.0' }}, (res) => {
       let rawData = [];
       res.on('data', chunk => rawData.push(chunk));
       res.on('end', () => {
