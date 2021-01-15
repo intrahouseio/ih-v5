@@ -590,6 +590,7 @@ async function install_core() {
   console.log('');
 
   await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/temp/deps.zip`));
+  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/temp/deps.zip`));
   await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
 
   console.log('');
