@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
+const dns = require('dns');
 
 const COLOR_CLEAR = '\x1b[0m';
 const COLOR_TITLE = '\x1b[33m';
