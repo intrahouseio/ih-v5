@@ -10,9 +10,11 @@ function config {
    name_service="ih-v5"
 
    if [ -n "$1" ]; then
+     echo "arg1"
      lang="$1"
    fi
    if [ -n "$2" ]; then
+     echo "arg2"
      name_service="$2"
    fi
 
