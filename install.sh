@@ -4,18 +4,20 @@
 
 echo -e "\033[0;31m"
 
+#-------------- args
+arg1=$1
+arg2=$2
+
 #-------------- functions
 function config {
    lang="en"
    name_service="ih-v5"
 
-   if [ -n "$1" ]; then
-     echo "arg1"
-     lang="$1"
+   if [ -n "$arg1" ]; then
+     lang="$arg1"
    fi
-   if [ -n "$2" ]; then
-     echo "arg2"
-     name_service="$2"
+   if [ -n "$arg2" ]; then
+     name_service="$arg2"
    fi
 
    pwd=$(pwd)
