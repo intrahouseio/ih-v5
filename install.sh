@@ -8,7 +8,7 @@ echo -e "\033[0;31m"
 function config {
    lang="en"
    name_service="ih-v5"
-   
+
    if [ -n "$1" ]; then
      lang="$1"
    fi
@@ -52,7 +52,7 @@ function install {
  # echo -e "\033[0;33m"
  # echo -e "INSTALL:\033[0;34m"
   echo -e "\033[0m"
-  sudo sudo "$root/node/bin/node" "$root/script.js $lang $name_service"
+  sudo sudo "$root/node/bin/node" "$root/script.js" $lang $name_service
 
 }
 
