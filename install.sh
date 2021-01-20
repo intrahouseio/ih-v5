@@ -6,8 +6,17 @@ echo -e "\033[0;31m"
 
 #-------------- functions
 function config {
-   pwd=$(pwd)
+   lang="en"
    name_service="ih-v5"
+   
+   if [ -n "$1" ]; then
+     lang="$1"
+   fi
+   if [ -n "$2" ]; then
+     name_service="$2"
+   fi
+
+   pwd=$(pwd)
    root="/opt/$name_service"
    temp="$root/temp"
    node="$root/node"
@@ -43,7 +52,7 @@ function install {
  # echo -e "\033[0;33m"
  # echo -e "INSTALL:\033[0;34m"
   echo -e "\033[0m"
-  sudo sudo "$root/node/bin/node" "$root/script.js"
+  sudo sudo "$root/node/bin/node" "$root/script.js $lang $name_service"
 
 }
 

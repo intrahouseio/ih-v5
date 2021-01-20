@@ -16,9 +16,12 @@ const COLOR_ERROR = '\x1b[31m';
 const COLOR_INFO  = '\x1b[35m';
 
 const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
- 
+
+const LANG = process.argv[2] || 'en';
+const SERVICE_NAME = process.argv[3] || 'ih-v5';
 
 const options = {
+  lang: LANG,
   project_name: `demo_${Date.now()}`,
   port: 8088,
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
@@ -26,9 +29,9 @@ const options = {
   files_url: 'https://github.com/intrahouseio/ih-v5/raw/main',
   plugins_url: 'https://github.com/intrahouseio',
   asset_name: 'ih-systems.zip',
-  service_name: 'ih-v5',
-  install_path: '/opt/ih-v5',
-  data_path: '/var/lib/ih-v5', 
+  service_name: SERVICE_NAME,
+  install_path: `/opt/${SERVICE_NAME}`,
+  data_path: `/var/lib/${SERVICE_NAME}`, 
   install_deps: [
     { 
       name: 'zip', 
@@ -78,7 +81,7 @@ function get_config() {
   return JSON.stringify({
     project: options.project_name,
     name_service: options.service_name,
-    lang: 'ru',
+    lang: options.lang,
     port: options.port,
   }, null, 2)
 }
