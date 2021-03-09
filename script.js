@@ -6,6 +6,7 @@ const https = require('https');
 const child_process = require('child_process');
 const { networkInterfaces } = require('os');
 const dns = require('dns');
+const readline = require('readline');
 
 const COLOR_CLEAR = '\x1b[0m';
 const COLOR_TITLE = '\x1b[33m';
@@ -396,8 +397,13 @@ function progress_bar_stop(text = 'ok', color = COLOR_OK, ext = null) {
 
     clearInterval(options.__bar_timer);
 
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
+    if (process.stdout.clearLine) {
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+    } else {
+      readline.clearLine(process.stdout);
+      readline.cursorTo(process.stdout, 0);
+    }
 
     print_row(options.__bar_name, true, text, '', color, COLOR_CLEAR, 2, ext)
     print_row('', true, '\n', '\n', COLOR_CLEAR, COLOR_CLEAR, 2)
@@ -409,8 +415,13 @@ function progress_bar_stop(text = 'ok', color = COLOR_OK, ext = null) {
 }
 
 function print_bar() {
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
+  if (process.stdout.clearLine) {
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+  } else {
+    readline.clearLine(process.stdout);
+    readline.cursorTo(process.stdout, 0);
+  }
 
   print_row(options.__bar_name, true, BAR_ASSETS[options.__bar_tick], '', COLOR_CLEAR, COLOR_ERROR, 2)
   
