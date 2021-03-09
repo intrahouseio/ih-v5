@@ -343,9 +343,32 @@ function checkPath(pathName) {
   return fs.existsSync(pathName) && !statFollowLinks(pathName).isDirectory();
 }
 
-async function detect_init_system() {
-    let system = null;
+function hasDockerEnv() {
+	try {
+		fs.statSync('/.dockerenv');
+		return true;
+	} catch () {
+		return false;
+	}
+}
 
+function hasDockerCGroup() {
+	try {
+		return fs.readFileSync('/proc/self/cgroup', 'utf8').includes('docker');
+	} catch () {
+		return false;
+	}
+}
+
+async function detect_init_system() {
+    const isDocker = hasDockerEnv() || hasDockerCGroup();
+
+    if (isDocker) {
+      return 'docker';
+    } 
+
+    let system = null;
+    
     const hash_map = {
       'systemctl'  : 'systemd',
       'update-rc.d': 'upstart',
@@ -669,7 +692,9 @@ async function register_service() {
 
   print_row('init system detected', service, init_system, '[not supported]', COLOR_INFO, COLOR_ERROR)
 
-  if (service) {
+  if (init_system === 'docker') {
+    console.log('Please run this service manually...');
+  } else if (service) {
     console.log('');
 
     await cmd('service config file', fsp.writeFile(service.destination, service.template, 'utf8'));
