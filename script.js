@@ -347,7 +347,7 @@ function hasDockerEnv() {
 	try {
 		fs.statSync('/.dockerenv');
 		return true;
-	} catch () {
+	} catch {
 		return false;
 	}
 }
@@ -355,7 +355,7 @@ function hasDockerEnv() {
 function hasDockerCGroup() {
 	try {
 		return fs.readFileSync('/proc/self/cgroup', 'utf8').includes('docker');
-	} catch () {
+	} catch {
 		return false;
 	}
 }
