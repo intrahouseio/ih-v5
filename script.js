@@ -74,6 +74,11 @@ const options = {
       name: 'influxDB',
       id: 'influx',
       destination: 'ih-dbagent-influx',
+    },
+    {
+      name: 'sqlite',
+      id: 'sqlite',
+      destination: 'ih-dbagent-sqlite',
     }
   ]
 }
