@@ -18,8 +18,9 @@ const COLOR_INFO  = '\x1b[35m';
 
 const BAR_ASSETS =  ['|', '/', '–', '\\'.slice(0)];
 
-const LANG = process.argv[2] || 'en';
-const SERVICE_NAME = process.argv[3] || 'ih-v5';
+const SYSTEM_TYPE = process.argv[2] || 'intrahouse';
+const LANG = process.argv[3] || 'en';
+const SERVICE_NAME = process.argv[4] || 'ih-v5';
 
 const options = {
   lang: LANG,
@@ -29,7 +30,7 @@ const options = {
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
   files_url: 'https://github.com/intrahouseio/ih-v5/raw/main',
   plugins_url: 'https://github.com/intrahouseio',
-  asset_name: 'ih-systems.zip',
+  asset_name: `${SYSTEM_TYPE}.zip`,
   service_name: SERVICE_NAME,
   install_path: `/opt/${SERVICE_NAME}`,
   data_path: `/var/lib/${SERVICE_NAME}`, 
