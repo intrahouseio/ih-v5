@@ -246,7 +246,7 @@ function json(url) {
 
 function git(id, name, _path) {
   return new Promise((resolve, reject) => {
-    const _pathz = `${options.install_path}/temp/${id}.zip`;
+    const _pathz = `${path.join(options.install_path, 'temp', `${id}.zip`)}`;
     json(`https://api.github.com/repos/intrahouseio/${name}/releases/latest`)
       .then(res => {
         if (res.zipball_url) {
@@ -271,14 +271,14 @@ function git(id, name, _path) {
                 })
                 .catch(reject);
               } else {
-                exec(`unzip -o ${_pathz} -d ${options.install_path}/temp/${id}`)
+                exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${_pathz} -o${path.join(options.install_path, 'temp', id)}`)
                 .then(() => {
-                  fs.readdir(`${options.install_path}/temp/${id}`, (err, files) => {
+                  fs.readdir(`${path.join(options.install_path, 'temp', id)}`, (err, files) => {
                     if (err) {
                       reject(err)
                     } else {
                       if (files.length === 1) {
-                        dir(`${options.install_path}/temp/${id}/${files[0]}`, `${_path}/${id}`)
+                        dir(`${path.join(options.install_path, 'temp', id, files[0])}`, path.join(_path, id))
                           .then(resolve)
                           .catch(reject);
                       } else {
@@ -677,13 +677,17 @@ async function install_core() {
   if (os.platform() !== 'win32') {
     await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
   } else {
-    await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
+    await cmd('extract dependencies', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'deps.zip')} -o${path.join(options.install_path, 'backend')}`));
   }
 
   console.log('');
  
   await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`), true, false);
-  await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
+  if (os.platform() !== 'win32') {
+    await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
+  } else {
+    await cmd('extract project', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'project.zip')} -o${path.join(options.install_path, 'temp', 'project')}`), true, false);
+  }
   await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`), true, false);
 
   console.log('');
