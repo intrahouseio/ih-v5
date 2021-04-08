@@ -55,19 +55,11 @@ exit $LASTEXITCODE
 
 if (Get-NetFirewallRule -DisplayName ih-v5 -ErrorAction SilentlyContinue) {
 } else {
-New-NetFirewallRule -DisplayName "$name_service" -Direction Inbound -Program "$root_path\node-v8.17.0-win-x64\node.exe" -RemoteAddress ANY -Action Allow | Out-Null
+New-NetFirewallRule -DisplayName "$name_service" -Direction Inbound -Program "$root_path\node-v14.15.1-win-x64\node.exe" -RemoteAddress ANY -Action Allow | Out-Null
 }
 
 if (Get-Service -Name "$name_service" -ErrorAction SilentlyContinue) {
 cmd /c "SC STOP ih-v5.exe" | Out-Null
-}
-#-------------- end
-
-
-#-------------- tools
-
-function unzip($args) {
-    Start-Process "$root_path\7z.exe" -ArgumentList $args
 }
 #-------------- end
 

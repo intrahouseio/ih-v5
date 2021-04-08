@@ -645,13 +645,21 @@ async function install_core() {
   console.log('');
 
   await cmd('downloading core', file(asset.browser_download_url, `${options.install_path}/temp/core.zip`));
-  await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
+  if (os.platform() !== 'win32') {
+    await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
+  } else {
+    await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
+  }
 
   console.log('');
 
   await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/temp/deps.zip`));
-  await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
-
+  if (os.platform() !== 'win32') {
+    await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
+  } else {
+    await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
+  }
+  
   console.log('');
  
   await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`), true, false);
