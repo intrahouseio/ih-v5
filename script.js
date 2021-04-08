@@ -668,7 +668,7 @@ async function install_core() {
   if (os.platform() !== 'win32') {
     await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
   } else {
-    await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
+    await cmd('extract core', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'core.zip')} -o${options.install_path}`));
   }
 
   console.log('');
