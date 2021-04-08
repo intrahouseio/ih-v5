@@ -1,4 +1,4 @@
-### Mac OS / Debian / Ubuntu
+## Mac OS / Debian / Ubuntu
 
 ##### INTRA HOUSE
 
@@ -9,7 +9,7 @@
 `curl -sL https://git.io/JYAeq | sudo -E bash -s ru`
 
 
-### Windows
+## Windows
 
 ##### INTRA HOUSE
 
