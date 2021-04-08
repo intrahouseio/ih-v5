@@ -1,3 +1,4 @@
+const os = require('os');
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
@@ -32,9 +33,9 @@ const options = {
   plugins_url: 'https://github.com/intrahouseio',
   asset_name: `${SYSTEM_TYPE}.zip`,
   service_name: SERVICE_NAME,
-  install_path: `/opt/${SERVICE_NAME}`,
-  data_path: `/var/lib/${SERVICE_NAME}`, 
-  install_deps: [
+  install_path: os.platform() !== 'win32' ? `/opt/${SERVICE_NAME}` : path.join(process.env.LOCALAPPDATA, SERVICE_NAME),
+  data_path: os.platform() !== 'win32' ? `/var/lib/${SERVICE_NAME}` : path.join(process.env.ProgramData, SERVICE_NAME), 
+  install_deps: os.platform() !== 'win32' ? [
     { 
       name: 'zip', 
       check: { 
@@ -62,7 +63,7 @@ const options = {
         linux: 'sudo apt-get install -y rsync',
       },
     },
-  ],
+  ] : [],
   install_plugins: [
     { 
       name: 'emulator',
@@ -368,6 +369,10 @@ function hasDockerCGroup() {
 
 async function detect_init_system() {
     const isDocker = hasDockerEnv() || hasDockerCGroup();
+
+    if (os.platform() === 'win32') {
+      return 'windows_service';
+    }
 
     if (isDocker) {
       return 'docker';
