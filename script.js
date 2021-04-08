@@ -252,7 +252,8 @@ function git(id, name, _path) {
         if (res.zipball_url) {
           file(res.zipball_url, _pathz)
             .then(() => {
-              exec(`unzip -o ${_pathz} -d ${options.install_path}/temp/${id}`)
+              if (os.platform() !== 'win32') {
+                exec(`unzip -o ${_pathz} -d ${options.install_path}/temp/${id}`)
                 .then(() => {
                   fs.readdir(`${options.install_path}/temp/${id}`, (err, files) => {
                     if (err) {
@@ -269,6 +270,25 @@ function git(id, name, _path) {
                   });
                 })
                 .catch(reject);
+              } else {
+                exec(`unzip -o ${_pathz} -d ${options.install_path}/temp/${id}`)
+                .then(() => {
+                  fs.readdir(`${options.install_path}/temp/${id}`, (err, files) => {
+                    if (err) {
+                      reject(err)
+                    } else {
+                      if (files.length === 1) {
+                        dir(`${options.install_path}/temp/${id}/${files[0]}`, `${_path}/${id}`)
+                          .then(resolve)
+                          .catch(reject);
+                      } else {
+                        reject('unzip folder empty or many files!')
+                      }
+                    }
+                  });
+                })
+                .catch(reject);
+              }
             })
             .catch(reject)
         } else {
@@ -659,7 +679,7 @@ async function install_core() {
   } else {
     await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
   }
-  
+
   console.log('');
  
   await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`), true, false);
