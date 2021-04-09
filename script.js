@@ -86,6 +86,19 @@ const options = {
 }
 
 function get_config() {
+  if (os.platform() === 'win32') {
+    return JSON.stringify({
+      project: options.project_name,
+      name_service: options.service_name,
+      lang: options.lang,
+      port: options.port,
+      vardir: options.data_path,
+      node: path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node.exe'),
+      npm: `${path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node.exe')} ${path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node_modules', 'npm', 'bin', 'npm-cli.js')}`,
+      zip: path.join(options.install_path, 'tools', '7z.exe'),
+      unzip: path.join(options.install_path, 'tools', '7z.exe'),
+    }, null, 2)
+  } 
   return JSON.stringify({
     project: options.project_name,
     name_service: options.service_name,
