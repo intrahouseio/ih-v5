@@ -93,8 +93,8 @@ function get_config() {
       lang: options.lang,
       port: options.port,
       vardir: options.data_path,
-      node: path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node.exe'),
-      npm: `${path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node.exe')} ${path.join(options.install_path, 'nodnode-v14.15.1-win-x64', 'node_modules', 'npm', 'bin', 'npm-cli.js')}`,
+      node: path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe'),
+      npm: `${path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe')} ${path.join(options.install_path, 'node-v14.15.1-win-x64', 'node_modules', 'npm', 'bin', 'npm-cli.js')}`,
       zip: path.join(options.install_path, 'tools', '7z.exe'),
       unzip: path.join(options.install_path, 'tools', '7z.exe'),
     }, null, 2)
@@ -206,6 +206,10 @@ function get_template_service(type) {
       </plist>
       `
     };
+  }
+
+  if (type == 'windows_service') {
+    return true;
   }
 
   return null;
@@ -677,7 +681,7 @@ async function install_core() {
 
   console.log('');
 
-  await cmd('downloading core', file(asset.browser_download_url, `${options.install_path}/temp/core.zip`));
+  await cmd('downloading core', file(asset.browser_download_url, path.join(options.install_path, 'temp', 'core.zip')));
   if (os.platform() !== 'win32') {
     await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
   } else {
@@ -686,7 +690,7 @@ async function install_core() {
 
   console.log('');
 
-  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, `${options.install_path}/temp/deps.zip`));
+  await cmd('downloading dependencies', file(`${options.binary_url}/node_modules.zip`, path.join(options.install_path, 'temp', 'deps.zip')));
   if (os.platform() !== 'win32') {
     await cmd('extract dependencies', exec(`unzip -o ${options.install_path}/temp/deps.zip -d ${options.install_path}/backend`));
   } else {
@@ -695,24 +699,24 @@ async function install_core() {
 
   console.log('');
  
-  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, `${options.install_path}/temp/project.zip`), true, false);
+  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, path.join(options.install_path, 'temp', 'project.zip')), true, false);
   if (os.platform() !== 'win32') {
     await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
   } else {
     await cmd('extract project', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'project.zip')} -o${path.join(options.install_path, 'temp', 'project')}`), true, false);
   }
-  await cmd('copy project', dir(`${options.install_path}/temp/project`, `${options.data_path}/projects/${options.project_name}`), true, false);
+  await cmd('copy project', dir(path.join(options.install_path, 'temp', 'project'), path.join(options.data_path, 'projects', options.project_name)), true, false);
 
   console.log('');
 
   await get_port();
-  await cmd('create config', fsp.writeFile(`${options.install_path}/config.json`, get_config(),'utf8'));
+  await cmd('create config', fsp.writeFile(path.join(options.install_path, 'config.json'), get_config(),'utf8'));
 }
 
 async function install_plugins () {
   print_title('Install plugins');
   
-  fs.mkdirSync(`${options.data_path}/plugins`, { recursive: true });
+  fs.mkdirSync(path.join(options.data_path, 'plugins'), { recursive: true });
 
   let q = 0;
   
@@ -720,14 +724,14 @@ async function install_plugins () {
     if (q !== 0) {
       console.log('');
     }
-    await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/plugins`), true, false);
+    await cmd(`deploy ${i.name}`, git(i.id, i.destination, path.join(options.data_path, 'plugins')), true, false);
     q++
   }
 }
 
 async function install_agents () {
   print_title('Install agents');
-  fs.mkdirSync(`${options.data_path}/agents`, { recursive: true });
+  fs.mkdirSync(path.join(options.data_path, 'agents'), { recursive: true });
 
   let q = 0;
   
@@ -735,7 +739,7 @@ async function install_agents () {
     if (q !== 0) {
       console.log('');
     }
-    await cmd(`deploy ${i.name}`, git(i.id, i.destination, `${options.data_path}/agents`), true, false);
+    await cmd(`deploy ${i.name}`, git(i.id, i.destination, path.join(options.data_path, 'agents')), true, false);
     q++
   }
 }
@@ -750,6 +754,8 @@ async function register_service() {
 
   if (init_system === 'docker') {
     console.log('Please run this service manually...');
+  } else if (init_system === 'windows_service') {
+    console.log('Please run this service manually...windows');
   } else if (service) {
     console.log('');
 
