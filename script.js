@@ -556,9 +556,6 @@ function check_service() {
     if (os.platform() === 'win32') {
       exec(`sc query "${options.service_name.replace('-', '')}.exe" | find "RUNNING"`)
       .then(res => {
-        console.log(`sc query "${options.service_name.replace('-', '')}.exe" | find "RUNNING"`, '\n----')
-        console.log(res)
-        console.log('----')
         if (res.indexOf('RUNNING') === -1) {
           reject('service process not found!')
         } else {
