@@ -795,6 +795,11 @@ async function register_service() {
       `sc start ${options.service_name.replace('-', '')}.exe`
     ]));
 
+    console.log('');
+
+    await cmd('check service', check_service(), true, false);
+    await cmd('check port', check_port(), true, false);
+
   } else if (service) {
     console.log('');
 
