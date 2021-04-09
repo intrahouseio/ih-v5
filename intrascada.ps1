@@ -72,12 +72,12 @@ Write-Host -ForegroundColor Blue "
 
 
 
-  _____ _   _ _______ _____              _    _  ____  _    _  _____ ______ 
- |_   _| \ | |__   __|  __ \     /\     | |  | |/ __ \| |  | |/ ____|  ____|
-   | | |  \| |  | |  | |__) |   /  \    | |__| | |  | | |  | | (___ | |__   
-   | | | . ` |  | |  |  _  /   / /\ \   |  __  | |  | | |  | |\___ \|  __|  
-  _| |_| |\  |  | |  | | \ \  / ____ \  | |  | | |__| | |__| |____) | |____ 
- |_____|_| \_|  |_|  |_|  \_\/_/    \_\ |_|  |_|\____/ \____/|_____/|______|
+  _____ _   _ _______ _____               _____  _____          _____          
+ |_   _| \ | |__   __|  __ \     /\      / ____|/ ____|   /\   |  __ \   /\    
+   | | |  \| |  | |  | |__) |   /  \    | (___ | |       /  \  | |  | | /  \   
+   | | | . ` |  | |  |  _  /   / /\ \    \___ \| |      / /\ \ | |  | |/ /\ \  
+  _| |_| |\  |  | |  | | \ \  / ____ \   ____) | |____ / ____ \| |__| / ____ \ 
+ |_____|_| \_|  |_|  |_|  \_\/_/    \_\ |_____/ \_____/_/    \_\_____/_/    \_\
 
 
 
@@ -117,6 +117,6 @@ Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$root_path\install.ps
 
 Set-Location "$root_path"
 cmd /c "$root_path\node-v14.15.1-win-x64\node.exe" "$root_path\node-v14.15.1-win-x64\node_modules\npm\bin\npm-cli.js" i node-windows --only=prod --no-save --loglevel=error
-cmd /c "$root_path\node-v14.15.1-win-x64\node.exe" "$root_path\script.js" intrahouse $lang
+cmd /c "$root_path\node-v14.15.1-win-x64\node.exe" "$root_path\script.js" intrascada $lang
 
 #-------------- end
