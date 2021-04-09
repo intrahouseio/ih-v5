@@ -93,7 +93,7 @@ function get_config() {
       name_service: options.service_name,
       lang: options.lang,
       port: options.port,
-      vardir: options.data_path,
+      vardir: process.env.ProgramData,
       node: path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe'),
       npm: `${path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe')} ${path.join(options.install_path, 'node-v14.15.1-win-x64', 'node_modules', 'npm', 'bin', 'npm-cli.js')}`,
       zip: path.join(options.install_path, 'tools', '7z.exe'),
