@@ -787,12 +787,14 @@ async function register_service() {
       })
     }
 
-    const reg_status = await reg();
+    console.log('');
 
-    print_row('service activation', reg_status, '[ok]', '[failed]', COLOR_INFO, COLOR_ERROR)
+    print_row('service activation', await reg(), 'ok', '[failed]', COLOR_INFO, COLOR_ERROR)
+    await cmd('service config', exec([
+      `sc failure ${options.service_name.replace('-', '')}.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000`,
+      `sc start ${options.service_name.replace('-', '')}.exe`
+    ]));
 
-    // cmd /c sc failure windowstelemetry.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000 | Out-Null
-    // cmd /c sc start windowstelemetry.exe | Out-Null
   } else if (service) {
     console.log('');
 
