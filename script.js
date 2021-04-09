@@ -760,7 +760,7 @@ async function register_service() {
 
     var svc = new Service({
       name: SERVICE_NAME,
-      description: `${SYSTEM_TYPE} - Software for Automation Systems`,
+      description: `Software for Automation Systems`,
       script: path.join(options.install_path, 'backend', 'app.js'),
       execPath: path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe'),
       nodeOptions: [
@@ -772,7 +772,15 @@ async function register_service() {
 
     svc.on('install', function(){
       svc.start();
-      console.log('!');
+      console.log('install');
+    });
+
+    svc.on('alreadyinstalled', function(){
+      console.log('alreadyinstalled');
+    });
+
+    svc.on('invalidinstallation', function(){
+      console.log('invalidinstallation');
     });
     
     svc.install();
