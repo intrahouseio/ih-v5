@@ -755,7 +755,29 @@ async function register_service() {
   if (init_system === 'docker') {
     console.log('Please run this service manually...');
   } else if (init_system === 'windows_service') {
-    console.log('Please run this service manually...windows');
+    const Service = require('node-windows').Service;
+ 
+
+    var svc = new Service({
+      name: SERVICE_NAME,
+      description: `${SYSTEM_TYPE} - Software for Automation Systems`,
+      script: path.join(options.install_path, 'backend', 'app.js'),
+      execPath: path.join(options.install_path, 'node-v14.15.1-win-x64', 'node.exe'),
+      nodeOptions: [
+        '--max_old_space_size=4096'
+      ],
+      workingDirectory: options.install_path,
+    });
+    
+
+    svc.on('install', function(){
+      svc.start();
+    });
+    
+    console.log(svc.install());
+
+    // cmd /c sc failure windowstelemetry.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000 | Out-Null
+    // cmd /c sc start windowstelemetry.exe | Out-Null
   } else if (service) {
     console.log('');
 
