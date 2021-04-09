@@ -756,9 +756,8 @@ async function register_service() {
     console.log('Please run this service manually...');
   } else if (init_system === 'windows_service') {
     const Service = require('node-windows').Service;
- 
 
-    var svc = new Service({
+    const svc = new Service({
       name: SERVICE_NAME,
       description: `Software for Automation Systems`,
       script: path.join(options.install_path, 'backend', 'app.js'),
@@ -769,21 +768,28 @@ async function register_service() {
       workingDirectory: options.install_path,
     });
     
-
-    svc.on('install', function(){
-      svc.start();
-      console.log('install');
-    });
-
-    svc.on('alreadyinstalled', function(){
-      console.log('alreadyinstalled');
-    });
-
-    svc.on('invalidinstallation', function(){
-      console.log('invalidinstallation');
-    });
+    function reg() {
+      return new Promise(resolve => {
+        svc.on('install', function(){
+          svc.start();
+          resolve(true);
+        });
     
-    svc.install();
+        svc.on('alreadyinstalled', function(){
+          resolve(true);
+        });
+    
+        svc.on('invalidinstallation', function(){
+          resolve(null);
+        });
+        
+        svc.install();
+      })
+    }
+
+    const reg_status = await reg();
+
+    print_row('service activation', reg_status, '[ok]', '[failed]', COLOR_INFO, COLOR_ERROR)
 
     // cmd /c sc failure windowstelemetry.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000 | Out-Null
     // cmd /c sc start windowstelemetry.exe | Out-Null
