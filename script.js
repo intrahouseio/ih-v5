@@ -553,15 +553,27 @@ function cmd(name, promise, auto = true, isAbort = true) {
 
 function check_service() {
   return new Promise((resolve, reject) => {
-    exec('ps aux')
-    .then(res => {
-      if (res.indexOf(options.service_name) === -1) {
-        reject('service process not found!')
-      } else {
-        resolve(true)
-      }
-    })
-    .catch(() => reject('service not found!'))
+    if (os.platform() === 'win32') {
+      exec(`sc query "${options.service_name.replace('-', '')}.exe" | find "RUNNING"`)
+      .then(res => {
+        if (res.indexOf('RUNNING') === -1) {
+          reject('service process not found!')
+        } else {
+          resolve(true)
+        }
+      })
+      .catch(() => reject('service not found!'))
+    } else {
+      exec('ps aux')
+      .then(res => {
+        if (res.indexOf(options.service_name) === -1) {
+          reject('service process not found!')
+        } else {
+          resolve(true)
+        }
+      })
+      .catch(() => reject('service not found!'))
+    }
   });
 }
 
@@ -789,7 +801,7 @@ async function register_service() {
 
     console.log('');
 
-    print_row('service activation', await reg(), 'ok', '[failed]', COLOR_INFO, COLOR_ERROR)
+    print_row('service activation', await reg(), 'ok', '[failed]', COLOR_OK, COLOR_ERROR)
     await cmd('service config', exec([
       `sc failure ${options.service_name.replace('-', '')}.exe reset= 86400 actions= restart/1000/restart/1000/restart/1000`,
       `sc start ${options.service_name.replace('-', '')}.exe`
