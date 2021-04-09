@@ -820,7 +820,6 @@ async function register_service() {
 
     console.log('');
 
-    await cmd('check service', check_service(), true, false);
     await cmd('check port', check_port(), true, false);
 
   } else {
