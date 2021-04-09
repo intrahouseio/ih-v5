@@ -13,9 +13,9 @@
 
 ##### INTRA HOUSE
 
-cmd: `powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "$l='ru';iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/JYpbW'))"`  
+cmd: `powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "$l='ru';iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/JOe18'))"`  
 
 ##### INTRA SCADA
 
-`...`
+cmd: `powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "$l='ru';iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/JYpbW'))"`  
 

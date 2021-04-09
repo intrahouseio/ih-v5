@@ -43,7 +43,7 @@ New-Item -ItemType Directory -Force -Path "$root_path\temp" | Out-Null
 $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
 $testadmin = $currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 if ($testadmin -eq $false) {
-[IO.File]::WriteAllLines("$root_path\install.ps1", (New-Object System.Net.WebClient).DownloadString('https://git.io/JYpbW'))
+[IO.File]::WriteAllLines("$root_path\install.ps1", (New-Object System.Net.WebClient).DownloadString('https://git.io/JOe18'))
 $arg="-NoProfile -InputFormat None -ExecutionPolicy Bypass -NoExit -file $root_path\install.ps1 $l"
 Start-Process powershell.exe -Verb RunAs -ArgumentList($arg)
 exit $LASTEXITCODE
