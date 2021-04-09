@@ -26,6 +26,7 @@ const SERVICE_NAME = process.argv[4] || 'ih-v5';
 const options = {
   lang: LANG,
   project_name: `demo_${Date.now()}`,
+  project_remote_name: SYSTEM_TYPE === 'intrahouse' ? 'intrahouse.ihpack' : 'intrascada.ihpack',
   port: 8088,
   binary_url: 'https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0',
   asset_url: 'https://api.github.com/repos/intrahouseio/ih-v5/releases/latest',
@@ -711,7 +712,7 @@ async function install_core() {
 
   console.log('');
  
-  await cmd('downloading project', file(`${options.files_url}/projects/smarthome5.ihpack`, path.join(options.install_path, 'temp', 'project.zip')), true, false);
+  await cmd('downloading project', file(`${options.files_url}/projects/${options.project_remote_name}`, path.join(options.install_path, 'temp', 'project.zip')), true, false);
   if (os.platform() !== 'win32') {
     await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
   } else {
