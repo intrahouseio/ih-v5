@@ -70,14 +70,14 @@ const options = {
       name: 'emulator',
       id: 'emuls',
       destination: 'intraHouse.plugin-Sensors-Emulator',
-    }
+    },
+    { 
+      name: 'p2p',
+      id: 'xp2p',
+      destination: 'ih-v5-p2p-plugin',
+    },
   ],
   install_agents: [
-    {
-      name: 'influxDB',
-      id: 'influx',
-      destination: 'ih-dbagent-influx',
-    },
     {
       name: 'sqlite',
       id: 'sqlite',
