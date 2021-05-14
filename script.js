@@ -73,7 +73,7 @@ const options = {
     },
     { 
       name: 'p2p',
-      id: 'xp2p',
+      id: 'p2p',
       destination: 'ih-v5-p2p-plugin',
     },
   ],
