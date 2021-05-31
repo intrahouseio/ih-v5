@@ -76,6 +76,11 @@ const options = {
       id: 'p2p',
       destination: 'ih-v5-p2p-plugin',
     },
+    { 
+      name: 'webconsole',
+      id: 'webconsole',
+      destination: 'ih-v5-webconsole-plugin',
+    },
   ],
   install_agents: [
     {
