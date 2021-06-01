@@ -91,8 +91,6 @@ const options = {
   ]
 }
 
-console.log(options)
-
 function get_config() {
   if (process.env.WB_VERSION ) {
     return JSON.stringify({
