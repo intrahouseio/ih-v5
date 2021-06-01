@@ -698,7 +698,7 @@ async function install_core() {
   progress_bar_stop(res.tag_name, COLOR_INFO);
 
   console.log('');
-  console.log(options.install_path)
+
   await cmd('downloading core', file(asset.browser_download_url, path.join(options.install_path, 'temp', 'core.zip')));
   if (os.platform() !== 'win32') {
     await cmd('extract core', exec(`unzip -o ${options.install_path}/temp/core.zip -d ${options.install_path}`));
