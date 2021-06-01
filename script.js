@@ -34,8 +34,8 @@ const options = {
   plugins_url: 'https://github.com/intrahouseio',
   asset_name: `${SYSTEM_TYPE}.zip`,
   service_name: SERVICE_NAME,
-  install_path: os.platform() !== 'win32' ? `/opt/${SERVICE_NAME}` : path.join(process.env.LOCALAPPDATA, SERVICE_NAME),
-  data_path: os.platform() !== 'win32' ? `/var/lib/${SERVICE_NAME}` : path.join(process.env.ProgramData, SERVICE_NAME), 
+  install_path: os.platform() !== 'win32' ? (process.env.WB_VERSION ? `/mnt/data/opt/${SERVICE_NAME}` : `/opt/${SERVICE_NAME}`) : path.join(process.env.LOCALAPPDATA, SERVICE_NAME),
+  data_path: os.platform() !== 'win32' ? (process.env.WB_VERSION ? `/mnt/data/var/lib/${SERVICE_NAME}` : `/var/lib/${SERVICE_NAME}`) : path.join(process.env.ProgramData, SERVICE_NAME), 
   install_deps: os.platform() !== 'win32' ? [
     { 
       name: 'zip', 
