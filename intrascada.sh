@@ -60,7 +60,7 @@ echo -e "\033[0;31m"
 
 function install {
   echo -e "\033[0m"
-  sudo sudo "$root/node/bin/node" "$root/script.js" "intrascada" $lang $name_service
+  sudo sudo WB_VERSION=$WB_VERSION "$root/node/bin/node" "$root/script.js" "intrascada" $lang $name_service
 }
 
 function files {
