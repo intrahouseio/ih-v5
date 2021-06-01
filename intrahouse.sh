@@ -59,6 +59,13 @@ echo -e "\033[0;31m"
 }
 
 function install {
+  if [ ! -z $WB_VERSION ]
+  then
+   echo -e "\033[0;33m"
+   echo -e "Platform dependencies:\033[0;34m"
+   sudo apt-get update && apt-get install -y libatomic1
+  fi
+
   echo -e "\033[0m"
   sudo sudo WB_VERSION=$WB_VERSION "$root/node/bin/node" "$root/script.js" "intrascada" $lang $name_service
 }
