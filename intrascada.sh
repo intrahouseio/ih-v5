@@ -59,8 +59,15 @@ echo -e "\033[0;31m"
 }
 
 function install {
- # echo -e "\033[0;33m"
- # echo -e "INSTALL:\033[0;34m"
+  if [ -z $WB_VERSION ]
+  then
+
+  else
+    echo -e "\033[0;33m"
+    echo -e "Platform dependencies:\033[0;34m"
+    apt-get update > /dev/null && apt-get install -y zip > /dev/null
+  fi
+
   echo -e "\033[0m"
   sudo sudo "$root/node/bin/node" "$root/script.js" "intrascada" $lang $name_service
 
