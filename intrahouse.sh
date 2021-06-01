@@ -20,8 +20,14 @@ function config {
      name_service="$arg2"
    fi
 
+   if [ -z $WB_VERSION ]
+   then
+     root="/opt/$name_service"
+   else
+     root="/mnt/data/opt/$name_service"
+   fi
+
    pwd=$(pwd)
-   root="/opt/$name_service"
    temp="$root/temp"
    node="$root/node"
    url="https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0"
