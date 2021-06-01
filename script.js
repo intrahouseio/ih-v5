@@ -91,6 +91,8 @@ const options = {
   ]
 }
 
+console.log(options)
+
 function get_config() {
   if (os.platform() === 'win32') {
     return JSON.stringify({
