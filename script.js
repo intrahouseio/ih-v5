@@ -94,6 +94,15 @@ const options = {
 console.log(options)
 
 function get_config() {
+  if (process.env.WB_VERSION ) {
+    return JSON.stringify({
+      project: options.project_name,
+      name_service: options.service_name,
+      lang: options.lang,
+      port: options.port,
+      vardir: '/mnt/data/var/lib',
+    }, null, 2)
+  }
   if (os.platform() === 'win32') {
     return JSON.stringify({
       project: options.project_name,
