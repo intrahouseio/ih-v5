@@ -61,7 +61,7 @@ echo -e "\033[0;31m"
 function install {
   if [ -z $WB_VERSION ]
   then
-
+    echo ""
   else
     echo -e "\033[0;33m"
     echo -e "Platform dependencies:\033[0;34m"
