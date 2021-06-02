@@ -598,10 +598,10 @@ function check_port(isExist = false) {
 
     function check() {
       i++;
-      if (i > 5) {
+      if (i > 10) {
         reject('service port not found!')
       } else {
-        setTimeout(() => req(), 1700)
+        setTimeout(() => req(), 2000)
       }
     }
 
