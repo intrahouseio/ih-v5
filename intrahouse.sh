@@ -67,7 +67,7 @@ function install {
   fi
 
   echo -e "\033[0m"
-  sudo sudo WB_VERSION=$WB_VERSION "$root/node/bin/node" "$root/script.js" "intrascada" $lang $name_service
+  sudo sudo WB_VERSION=$WB_VERSION "$root/node/bin/node" "$root/script.js" "intrahouse" $lang $name_service
 }
 
 function files {
