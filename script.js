@@ -181,9 +181,9 @@ function get_template_service(type) {
 
   if (type === 'launchd') {
     return {
-      destination: path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`),
+      destination: path.join(process.env.HOME, `/System/Library/LaunchDaemons/${options.service_name}.plist`),
       commands: [
-        `launchctl load -w ${path.join(process.env.HOME, `Library/LaunchAgents/${options.service_name}.plist`)}`,
+        `launchctl load -w ${path.join(process.env.HOME, `/System/Library/LaunchDaemons/${options.service_name}.plist`)}`,
         `launchctl stop ${options.service_name}`,
         `launchctl start ${options.service_name}`,
       ],
