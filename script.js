@@ -187,39 +187,37 @@ function get_template_service(type) {
         `launchctl stop ${options.service_name}`,
         `launchctl start ${options.service_name}`,
       ],
-      template: `
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-            <string>${options.service_name}</string>
-          <key>KeepAlive</key>
-            <true/>
-          <key>ProgramArguments</key>
-            <array>
-              <string>${options.install_path}/node/bin/node</string>
-              <string>${options.install_path}/backend/app.js</string>
-              <string>prod</string>
-            </array>
-          <key>RunAtLoad</key>
-            <true/>
-          <key>OnDemand</key>
-            <false/>
-          <key>WorkingDirectory</key>
-            <string>${options.install_path}</string>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-              <string>${options.install_path}/node/bin</string>
-          </dict>
-          <key>StandardOutPath</key>
-            <string>${options.install_path}/launchdOutput.log</string>
-          <key>StandardErrorPath</key>
-            <string>${options.install_path}/launchdErrors.log</string>
-        </dict>
-      </plist>
-      `
+      template: `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+      <string>ih-v5</string>
+    <key>KeepAlive</key>
+      <true/>
+    <key>ProgramArguments</key>
+      <array>
+        <string>/opt/ih-v5/node/bin/node</string>
+        <string>/opt/ih-v5/backend/app.js</string>
+        <string>prod</string>
+      </array>
+    <key>RunAtLoad</key>
+      <true/>
+    <key>OnDemand</key>
+      <false/>
+    <key>WorkingDirectory</key>
+      <string>/opt/ih-v5</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+        <string>/opt/ih-v5/node/bin</string>
+    </dict>
+    <key>StandardOutPath</key>
+      <string>/opt/ih-v5/launchdOutput.log</string>
+    <key>StandardErrorPath</key>
+      <string>/opt/ih-v5/launchdErrors.log</string>
+  </dict>
+</plist>`
     };
   }
 
