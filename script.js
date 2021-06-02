@@ -190,33 +190,30 @@ function get_template_service(type) {
       template: `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-  <dict>
-    <key>Label</key>
-      <string>ih-v5</string>
-    <key>KeepAlive</key>
-      <true/>
-    <key>ProgramArguments</key>
-      <array>
-        <string>/opt/ih-v5/node/bin/node</string>
-        <string>/opt/ih-v5/backend/app.js</string>
-        <string>prod</string>
-      </array>
-    <key>RunAtLoad</key>
-      <true/>
-    <key>OnDemand</key>
-      <false/>
-    <key>WorkingDirectory</key>
-      <string>/opt/ih-v5</string>
-    <key>EnvironmentVariables</key>
-    <dict>
-      <key>PATH</key>
-        <string>/opt/ih-v5/node/bin</string>
-    </dict>
-    <key>StandardOutPath</key>
-      <string>/opt/ih-v5/launchdOutput.log</string>
-    <key>StandardErrorPath</key>
-      <string>/opt/ih-v5/launchdErrors.log</string>
-  </dict>
+<dict>
+  <key>LowPriorityIO</key>
+  <true/>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>Label</key>
+  <string>ih-v5</string>
+  <key>WorkingDirectory</key>
+  <string>/opt/ih-v5</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/ih-v5/node/bin/node</string>
+    <string>/opt/ih-v5/backend/app.js</string>
+    <string>prod</string>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/opt/ih-v5/launchdOutput.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/opt/ih-v5/launchdErrors.log</string>
+</dict>
 </plist>`
     };
   }
