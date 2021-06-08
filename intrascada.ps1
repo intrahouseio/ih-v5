@@ -32,6 +32,7 @@ $lang = switch ( $l )
 
 Remove-Item -Force -Recurse -ErrorAction SilentlyContinue $root_path
 New-Item -ItemType Directory -Force -Path $root_path | Out-Null
+New-Item -ItemType Directory -Force -Path "$root_path\assets" | Out-Null
 New-Item -ItemType Directory -Force -Path "$root_path\tools" | Out-Null
 New-Item -ItemType Directory -Force -Path "$root_path\temp" | Out-Null
 

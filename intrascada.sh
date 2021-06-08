@@ -28,6 +28,7 @@ function config {
    fi
 
    pwd=$(pwd)
+   assets="$root/assets"
    temp="$root/temp"
    node="$root/node"
    url="https://github.com/intrahouseio/ih-v5/releases/download/v0.0.0"
@@ -36,6 +37,7 @@ function config {
 function clear {
   rm -fr $root
   mkdir -p $root
+  mkdir -p $assets
   mkdir -p $temp
   mkdir -p $node
   cd $root

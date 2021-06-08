@@ -723,11 +723,11 @@ async function install_core() {
  
   await cmd('downloading project', file(`${options.files_url}/projects/${options.project_remote_name}`, path.join(options.install_path, 'temp', 'project.zip')), true, false);
   if (os.platform() !== 'win32') {
-    await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/temp/project`), true, false);
+    await cmd('extract project', exec(`unzip -o ${options.install_path}/temp/project.zip -d ${options.install_path}/assets/project`), true, false);
   } else {
-    await cmd('extract project', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'project.zip')} -o${path.join(options.install_path, 'temp', 'project')}`), true, false);
+    await cmd('extract project', exec(`${path.join(options.install_path, 'tools', '7z.exe')} x -y ${path.join(options.install_path, 'temp', 'project.zip')} -o${path.join(options.install_path, 'assets', 'project')}`), true, false);
   }
-  await cmd('copy project', dir(path.join(options.install_path, 'temp', 'project'), path.join(options.data_path, 'projects', options.project_name)), true, false);
+  await cmd('copy project', dir(path.join(options.install_path, 'assets', 'project'), path.join(options.data_path, 'projects', options.project_name)), true, false);
 
   console.log('');
 
